@@ -39,8 +39,8 @@ A self-hosted Python music bot for Discord that:
 1. **Clone the repo**
 
 ```bash
-git clone https://github.com/yourusername/discord-music-bot.git
-cd discord-music-bot
+git clone https://github.com/Hish-L/MusicPi.git
+cd MusicPi
 ```
 
 2. **Install dependencies**
@@ -84,20 +84,20 @@ python bot.py
 1. Create a service file:
 
 ```bash
-sudo nano /etc/systemd/system/musicbot.service
+sudo nano /etc/systemd/system/musicpi.service
 ```
 
 Paste this:
 
 ```ini
 [Unit]
-Description=Discord Music Bot
+Description=MusicPi Discord Bot
 After=network.target
 
 [Service]
 User=pi
-WorkingDirectory=/home/pi/musicbot
-ExecStart=/home/pi/musicbot/venv/bin/python /home/pi/musicbot/bot.py
+WorkingDirectory=/home/pi/MusicPi
+ExecStart=/home/pi/MusicPi/venv/bin/python /home/pi/MusicPi/bot.py
 Restart=always
 
 [Install]
@@ -110,14 +110,14 @@ WantedBy=multi-user.target
 
 ```bash
 sudo systemctl daemon-reexec
-sudo systemctl enable musicbot
-sudo systemctl start musicbot
+sudo systemctl enable musicpi
+sudo systemctl start musicpi
 ```
 
 3. Check logs:
 
 ```bash
-journalctl -u musicbot -f
+journalctl -u musicpi -f
 ```
 
 ---
