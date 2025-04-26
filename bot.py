@@ -6,6 +6,12 @@ from utils.playlist_importer import import_youtube_playlist
 from discord.ext import commands
 from music.player import MusicPlayer
 
+# Change this to restrict commands to single or multiple channels (separated by commas)
+# Leave empty if all channels are intended to be allowed
+
+ALLOWED_CHANNEL_IDS = [123456789012345678]
+bot_token = "INSERT_BOT_TOKEN_HERE"
+
 intents = discord.Intents.default()
 intents.message_content = True
 intents.guilds = True
@@ -19,6 +25,17 @@ def get_player(ctx):
     if ctx.guild.id not in music_players:
         music_players[ctx.guild.id] = MusicPlayer(bot, ctx)
     return music_players[ctx.guild.id]
+
+@bot.check
+async def only_allow_music_channel(ctx):
+    if not ALLOWED_CHANNEL_IDS:
+        return True  # ✅ no restriction, allow all channels
+
+    if ctx.channel.id not in ALLOWED_CHANNEL_IDS:
+        await ctx.send("❌ This command can only be used in the music request channel.")
+        return False
+
+    return True
 
 @bot.event
 async def on_ready():
@@ -172,7 +189,7 @@ async def help_command(ctx):
 `!playlist` — List all saved playlists  
 `!playlist create <name>` — Create a new playlist  
 `!playlist play <name>` — Play a saved playlist
-`!playlist import <name> <youtube_link>` - Add songs or list to playlist  
+`!playlist import <name> <youtube url>` - Add songs or list to playlist  
 `!playlist <name>` — Show files in a playlist
 `!playlist delete <name>` - Delete playlist and all its contents
 
@@ -182,4 +199,4 @@ async def help_command(ctx):
 """
     await ctx.send(help_text)
 
-bot.run("INSERT_BOT_TOKEN_HERE")
+bot.run(bot_token)
