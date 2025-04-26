@@ -1,0 +1,4 @@
+# Ignore local music and playlists
+data/
+playlists/
+venv/
