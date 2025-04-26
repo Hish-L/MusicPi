@@ -6,9 +6,9 @@ from utils.playlist_importer import import_youtube_playlist
 from discord.ext import commands
 from music.player import MusicPlayer
 
-# Change this to restrict commands to single or multiple channels (separated by commas)
-# Leave empty if all channels are intended to be allowed
-
+# Change this to restrict commands to
+# single or multiple channels
+# Leave empty if all channels are intended
 ALLOWED_CHANNEL_IDS = [123456789012345678]
 bot_token = "INSERT_BOT_TOKEN_HERE"
 
@@ -44,8 +44,21 @@ async def on_ready():
 @bot.command()
 @commands.check(is_dj)
 async def play(ctx, *, search: str):
-    await ctx.send(f"🔍 Searching and downloading '{search}'...")
     player = get_player(ctx)
+
+    # Support: !play playlist <name>
+    if search.lower().startswith(("playlist ", "pl ")):
+        parts = search.split(maxsplit=1)
+        if len(parts) < 2 or not parts[1].strip():
+            await ctx.send("❗ Usage: `!play playlist <name>` or `!play pl <name>`")
+            return
+
+        playlist_name = parts[1].strip()
+        await player.queue_local_playlist(ctx, playlist_name)
+        return
+
+    # Otherwise: search or play YouTube
+    await ctx.send(f"🔍 Searching and downloading '{search}'... hang tight!")
     await player.queue_song(ctx, search)
 
 @bot.command()
@@ -60,7 +73,7 @@ async def volume(ctx, value: int):
     player.set_volume(value / 100)
     await ctx.send(f"🔉 Volume set to {value}%")
 
-@bot.command()
+@bot.command(name="playlist", aliases=["pl"])
 @commands.check(is_dj)
 async def playlist(ctx, subcommand: str = None, name: str = None):
     playlists_path = "playlists"
@@ -166,7 +179,7 @@ async def shuffle(ctx):
     player = get_player(ctx)
     await player.shuffle_queue(ctx)
 
-@bot.command()
+@bot.command(name="stop", aliases=["leave", "quit", "disconnect", "exit"])
 @commands.check(is_dj)
 async def stop(ctx):
     player = get_player(ctx)
@@ -178,7 +191,8 @@ async def help_command(ctx):
 🎵 **Music Bot Commands** 🎵
 
 **Playback**
-`!play <search or url>` — Search YouTube or play direct link  
+`!play <search or url>` — Search YouTube or play direct link
+`!play playlist <name>` - Play a saved playlist  
 `!skip` — Skip current song  
 `!stop` — Stop and leave the voice channel  
 `!queue` — Show currently queued songs
@@ -189,7 +203,7 @@ async def help_command(ctx):
 `!playlist` — List all saved playlists  
 `!playlist create <name>` — Create a new playlist  
 `!playlist play <name>` — Play a saved playlist
-`!playlist import <name> <youtube url>` - Add songs or list to playlist  
+`!playlist import <name> <youtube_link>` - Add songs or list to playlist  
 `!playlist <name>` — Show files in a playlist
 `!playlist delete <name>` - Delete playlist and all its contents
 
